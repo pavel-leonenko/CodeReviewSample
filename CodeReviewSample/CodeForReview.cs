@@ -27,6 +27,11 @@ public class ForecastDetailsViewModel : ViewModelBase
     {
         WeatherForecastData = await new HttpService().Execute("weather-forecast/summary", WeatherForecastData,
             "application/json", "Tkkm9iCRWHecw");
+        if (WeatherForecastData.AtmospherePressure.Count > WeatherForecastData._forecastDurationInDaysFromNow)
+        {
+            AlertService.Instance.ShowAlert("Oops", "Something went wrong", "OK");
+            return;
+        }
         OnPropertyChanged("WeatherForecastData");
 
         foreach (var dailyForecast in DailyForecastDetails)
@@ -70,6 +75,11 @@ public class DayForecastSummaryViewModel : ViewModelBase
         dto = await new HttpService().Execute("weather-forecast/for-day", dto,
             "application/json", "Tkkm9iCRWHecw")
             .ConfigureAwait(false);
+        if (dto.Date != DateTime.Today.AddDays(dayNumber))
+        {
+            AlertService.Instance.ShowAlert("Oops", "Something went wrong", "OK");
+            return;
+        }
 
         if (dto.weatherType=="cloudy")
         {
@@ -103,6 +113,11 @@ public class HttpService
         request.Headers.Add("Client-Secret", clientSecret);
 
         var _response = await new HttpClient().SendAsync(request).GetAwaiter().GetResult().Content.ReadAsStringAsync();
+        if (_response == null || _response == "")
+        {
+            AlertService.Instance.ShowAlert("Oops", "Something went wrong", "OK");
+            return default;
+        }
         return JsonConvert.DeserializeObject<T>(_response);
     }
 }
