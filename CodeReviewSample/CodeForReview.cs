@@ -33,11 +33,22 @@ public class ForecastDetailsViewModel : ViewModelBase
         {
             dailyForecast.RefreshData(this);
         }
+
+        Cloudy = DailyForecastDetails.Where(day => day.weatherTypeIcon == "cloud.png").Count();
+        OnPropertyChanged("Cloudy");
+        WindyDays = DailyForecastDetails.Where(day => day.weatherTypeIcon == "bad_weather.png").Count();
+        OnPropertyChanged("WindyDays");
+        sunny = DailyForecastDetails.Where(day => day.weatherTypeIcon == "sun.jpg").Count();
+        OnPropertyChanged("sunny");
     }
     
     public WeatherForecastDto? WeatherForecastData { get; set; }
     
     public IEnumerable<DayForecastSummaryViewModel> DailyForecastDetails { get; set; }
+    
+    public int Cloudy { get; set; }
+    public int WindyDays { get; set; }
+    public int sunny { get; set; }
 }
 
 public class DayForecastSummaryViewModel : ViewModelBase
